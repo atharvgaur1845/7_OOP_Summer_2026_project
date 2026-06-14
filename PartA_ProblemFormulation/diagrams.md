@@ -1,146 +1,67 @@
 # Diagrams — Accommodation Allocation Engine
 
-Render these with any Mermaid-capable viewer (GitHub, VS Code Markdown Preview Mermaid
-extension, or <https://mermaid.live>). Export to PNG/SVG for the report/slides.
+Each diagram below is provided three ways:
+
+- a **rendered PNG** (embedded here; drop into the report/Word),
+- a **rendered SVG** in `diagrams/` (used by `slides.md`; scales without blur),
+- the **styled Mermaid source** `diagrams/NN-name.mmd` (edit + re-render).
+
+**Re-render** (uses the system Chrome; produces both formats):
+
+```bash
+cd diagrams
+npx -y @mermaid-js/mermaid-cli -i 01-integration.mmd -o 01-integration.svg -b white
+npx -y @mermaid-js/mermaid-cli -i 01-integration.mmd -o 01-integration.png -b white -w 1500
+```
+
+A `puppeteer.json` with `{"executablePath":"/usr/bin/google-chrome","args":["--no-sandbox"]}`
+may be needed via `-p puppeteer.json` on Linux.
 
 ---
 
-## A. Data-flow / integration diagram
+## 1. Integration / data flow
 
-```mermaid
-flowchart LR
-    subgraph Backend["Festival backend (Django monolith)"]
-        ACC["Accommodation module"]
-        WAL["Wallet module"]
-        MOB["Mobile app"]
-    end
+How the engine plugs into the festival platform (Accommodation → engine → Wallet / Mobile /
+Admin), plus the simulated real-time arrival stream.
 
-    ACC -- "participants.csv/json\nrooms.csv/json" --> ENG
-
-    subgraph ENG["Accommodation Allocation Engine (Java)"]
-        IO1["Repository&lt;T&gt; (DAO)\nCSV / JSON loaders"]
-        SVC["AccommodationAllocator"]
-        ALG["HungarianAlgorithm\n+ BipartiteMatcher"]
-        OUT["AllocationWriter\nAllocationStore (.ser)"]
-        IO1 --> SVC --> ALG --> SVC --> OUT
-    end
-
-    OUT -- "allocations.csv/json\n(charge = price x nights)" --> WAL
-    OUT -- "allocations.csv/json" --> MOB
-    OUT -- "waitlist.csv/json" --> ADMIN["Admin / Warden dashboard"]
-    STREAM["Live arrivals\n(WebSocket ~ BlockingQueue)"] -- "ArrivalStream" --> SVC
-```
+![Integration](diagrams/01-integration.png)
 
 ---
 
-## B. Allocation pipeline (sequence)
+## 2. Allocation pipeline
 
-```mermaid
-sequenceDiagram
-    participant U as Admin/CLI
-    participant S as AccommodationAllocator
-    participant B as CostMatrixBuilder
-    participant H as HungarianAlgorithm
-    participant M as BipartiteMatcher
+The six stages every run goes through, with the Hungarian solve highlighted.
 
-    U->>S: allocate(participants, rooms)
-    S->>S: validate (ids, capacity)
-    S->>B: build cost matrix (parallel, ExecutorService)
-    B-->>S: square KxK CostMatrix (+ priority bias)
-    S->>H: solve(matrix)
-    H-->>S: optimal assignment
-    S->>S: interpret -> assigned / stranded
-    S->>M: match stranded to free beds (feasible only)
-    M-->>S: extra placements
-    S->>S: roommate co-location nudge (cost-neutral)
-    S->>S: build waitlist (PriorityQueue)
-    S-->>U: AllocationResult (allocations, waitlist, metrics)
-```
+![Pipeline](diagrams/02-pipeline.png)
 
 ---
 
-## C. UML class diagram (core)
+## 3. The modelling trick (capacity → beds → square matrix)
 
-```mermaid
-classDiagram
-    class Participant {
-      +String id
-      +Gender gender
-      +double budgetPerNight
-      +int nights
-      +boolean needsAccessibleRoom
-      +Category category
-      +Preference preference
-    }
-    class Room {
-      +String id
-      +int capacity
-      +Gender genderPolicy
-      +double pricePerNight
-      +boolean accessible
-    }
-    class RoomSlot {
-      +Room room
-      +int index
-    }
-    class Allocation {
-      +double cost
-      +double charge()
-    }
-    class AllocationResult {
-      +List~Allocation~ allocations
-      +List~Participant~ waitlist
-      +Metrics metrics
-      +roommatesOf(id)
-    }
-    class CostStrategy {
-      <<interface>>
-      +cost(Participant, Room) double
-    }
-    class DefaultCostStrategy
-    class HungarianAlgorithm {
-      +solve(double[][]) int[]$
-    }
-    class BipartiteMatcher {
-      +match(adj, rightSize) int[]$
-    }
-    class CostMatrixBuilder {
-      +build(participants, rooms) CostMatrix
-    }
-    class AccommodationAllocator {
-      +allocate(participants, rooms) AllocationResult
-    }
-    class Repository~T~ {
-      <<interface>>
-      +loadAll() List~T~
-    }
+How a many-to-one, unequal-size problem becomes a square assignment the Hungarian algorithm
+solves exactly.
 
-    CostStrategy <|.. DefaultCostStrategy
-    AccommodationAllocator --> CostStrategy
-    AccommodationAllocator --> CostMatrixBuilder
-    AccommodationAllocator --> HungarianAlgorithm
-    AccommodationAllocator --> BipartiteMatcher
-    AccommodationAllocator --> AllocationResult
-    AllocationResult --> Allocation
-    Allocation --> Participant
-    Allocation --> Room
-    CostMatrixBuilder --> RoomSlot
-    RoomSlot --> Room
-    Repository~T~ ..> Participant
-    Repository~T~ ..> Room
-```
+![Model](diagrams/03-model.png)
 
 ---
 
-## D. GUI roles (Observer / MVC)
+## 4. Software architecture
 
-```mermaid
-flowchart TB
-    M["AllocationModel\n(Subject / Model)"]
-    A["AdminDashboard\n(load, run, simulate arrivals, export)"]
-    P["ParticipantView\n(my room / waitlist position)"]
-    M -- "onModelChanged()" --> A
-    M -- "onModelChanged()" --> P
-    A -- "runAllocation() via SwingWorker" --> M
-    A -- "onArrival() via ArrivalStream" --> M
-```
+Packages and how the entry points (CLI, GUI) flow through the service into the algorithm, cost,
+IO and concurrency layers.
+
+![Architecture](diagrams/04-architecture.png)
+
+---
+
+## 5. UML class diagram (core)
+
+![UML](diagrams/05-uml.png)
+
+---
+
+## 6. GUI — two roles (MVC + Observer)
+
+One shared observable model; an Admin dashboard and a Participant view both observe it.
+
+![GUI](diagrams/06-gui.png)

@@ -1,0 +1,19 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Segoe UI, Helvetica, Arial','fontSize':'15px','lineColor':'#64748b','primaryTextColor':'#0f172a'}}}%%
+flowchart TB
+    M[" AllocationModel<br/><small>Subject / Model · observable</small>"]:::model
+
+    subgraph VIEWS["Two role-specific views (Observer)"]
+        direction LR
+        A[" AdminDashboard<br/><small>load · run · simulate arrivals · export<br/>JTable + live metrics</small>"]:::admin
+        P[" ParticipantView<br/><small>my room · roommates · waitlist position</small>"]:::part
+    end
+
+    M -- "onModelChanged()" --> A
+    M -- "onModelChanged()" --> P
+    A -- "runAllocation()<br/><small>SwingWorker</small>" --> M
+    A -- "onArrival()<br/><small>ArrivalStream</small>" --> M
+
+    classDef model fill:#ede9fe,stroke:#6d28d9,stroke-width:2.5px,color:#0f172a;
+    classDef admin fill:#dbeafe,stroke:#1d4ed8,stroke-width:2px,color:#0f172a;
+    classDef part fill:#d1fae5,stroke:#047857,stroke-width:2px,color:#0f172a;
+    style VIEWS fill:#f8fafc,stroke:#cbd5e1,color:#1e293b;

@@ -1,0 +1,35 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Segoe UI, Helvetica, Arial','fontSize':'15px','lineColor':'#64748b','primaryTextColor':'#0f172a'}}}%%
+flowchart TB
+    subgraph S1["① Rooms have capacity"]
+        direction LR
+        RA["Room H1-101<br/>cap = 2"]
+        RB["Room H2-201<br/>cap = 3"]
+    end
+    subgraph S2["② Expand each room into beds"]
+        direction LR
+        B1["H1-101#0"]:::bed
+        B2["H1-101#1"]:::bed
+        B3["H2-201#0"]:::bed
+        B4["H2-201#1"]:::bed
+        B5["H2-201#2"]:::bed
+    end
+    subgraph S3["③ Pad to a square K×K cost matrix"]
+        direction LR
+        M["K = max(#participants, #beds)<br/><br/>real cell = soft penalty<br/>forbidden = ∞ (hard constraint)<br/>dummy row → empty bed<br/>dummy col → waitlisted"]:::matrix
+    end
+    subgraph S4["④ Solve"]
+        direction LR
+        SOLVE["Hungarian O(K³)<br/>→ optimal 1-to-1 assignment"]:::solve
+    end
+
+    S1 --> S2 --> S3 --> S4
+
+    classDef bed fill:#fef3c7,stroke:#b45309,stroke-width:1.5px,color:#0f172a;
+    classDef matrix fill:#ede9fe,stroke:#6d28d9,stroke-width:2px,color:#0f172a;
+    classDef solve fill:#d1fae5,stroke:#047857,stroke-width:2.5px,color:#0f172a;
+    style S1 fill:#eff6ff,stroke:#93c5fd,color:#1e293b;
+    style S2 fill:#fffbeb,stroke:#fcd34d,color:#1e293b;
+    style S3 fill:#f5f3ff,stroke:#c4b5fd,color:#1e293b;
+    style S4 fill:#ecfdf5,stroke:#6ee7b7,color:#1e293b;
+    RA --> B1 & B2
+    RB --> B3 & B4 & B5

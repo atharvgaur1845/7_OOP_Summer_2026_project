@@ -1,0 +1,17 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Segoe UI, Helvetica, Arial','fontSize':'16px','lineColor':'#6d28d9','primaryTextColor':'#0f172a'}}}%%
+flowchart TB
+    IN(["Participants  +  Rooms"]):::io
+    V["1 · Validate<br/><small>unique IDs, capacity ≥ 0</small>"]:::step
+    B["2 · Build cost matrix<br/><small>rooms → beds · soft penalties + hard ∞<br/>parallel · ExecutorService</small>"]:::step
+    H["3 · Hungarian solve<br/><small>minimum-cost assignment · O(K³)</small>"]:::core
+    F["4 · Bipartite fallback<br/><small>seat stranded-but-feasible participants</small>"]:::step
+    R["5 · Roommate nudge<br/><small>cost-neutral co-location</small>"]:::step
+    W["6 · Build waitlist<br/><small>PriorityQueue · performers first</small>"]:::step
+    OUT(["AllocationResult<br/><small>allocations · waitlist · metrics</small>"]):::io
+
+    IN --> V --> B --> H --> F --> R --> W --> OUT
+
+    classDef step fill:#ede9fe,stroke:#6d28d9,stroke-width:2px,color:#0f172a;
+    classDef core fill:#d1fae5,stroke:#047857,stroke-width:3px,color:#0f172a;
+    classDef io fill:#fef3c7,stroke:#b45309,stroke-width:2px,color:#0f172a;
+    linkStyle default stroke:#6d28d9,stroke-width:2px;

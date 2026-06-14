@@ -1,0 +1,59 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Segoe UI, Helvetica, Arial','fontSize':'14px','primaryColor':'#ede9fe','primaryBorderColor':'#6d28d9','primaryTextColor':'#0f172a','lineColor':'#64748b'}}}%%
+classDiagram
+    direction LR
+
+    class Participant {
+      +String id
+      +Gender gender
+      +double budgetPerNight
+      +int nights
+      +boolean needsAccessibleRoom
+      +Category category
+      +Preference preference
+    }
+    class Room {
+      +String id
+      +int capacity
+      +Gender genderPolicy
+      +double pricePerNight
+      +boolean accessible
+    }
+    class Allocation {
+      +double cost
+      +double charge()
+    }
+    class AllocationResult {
+      +List~Allocation~ allocations
+      +List~Participant~ waitlist
+      +Metrics metrics
+      +roommatesOf(id)
+    }
+    class CostStrategy {
+      <<interface>>
+      +cost(Participant, Room) double
+    }
+    class DefaultCostStrategy
+    class HungarianAlgorithm {
+      +solve(double[][]) int[]$
+    }
+    class BipartiteMatcher {
+      +match(adj, n) int[]$
+    }
+    class AccommodationAllocator {
+      +allocate(participants, rooms) AllocationResult
+    }
+    class Repository~T~ {
+      <<interface>>
+      +loadAll() List~T~
+    }
+
+    CostStrategy <|.. DefaultCostStrategy
+    AccommodationAllocator --> CostStrategy
+    AccommodationAllocator --> HungarianAlgorithm
+    AccommodationAllocator --> BipartiteMatcher
+    AccommodationAllocator --> AllocationResult
+    AllocationResult "1" --> "*" Allocation
+    Allocation --> Participant
+    Allocation --> Room
+    Repository~T~ ..> Participant
+    Repository~T~ ..> Room

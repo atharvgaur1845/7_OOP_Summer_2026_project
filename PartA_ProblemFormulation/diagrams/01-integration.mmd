@@ -1,0 +1,35 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Segoe UI, Helvetica, Arial','fontSize':'16px','lineColor':'#64748b','primaryTextColor':'#0f172a'}}}%%
+flowchart LR
+    subgraph BACKEND["Festival Backend &nbsp;(Django monolith)"]
+        direction TB
+        ACC[" Accommodation<br/>module"]
+        WAL[" Wallet<br/>module"]
+        MOB[" Mobile app"]
+        ADM[" Admin /<br/>Warden"]
+    end
+
+    subgraph ENGINE["Accommodation Allocation Engine &nbsp;(Java)"]
+        direction TB
+        IOIN[" Repository&lt;T&gt; · DAO<br/>CSV / JSON loaders"]
+        CORE[" Hungarian solve<br/>+ bipartite fallback"]
+        IOUT[" AllocationWriter<br/>+ snapshot (.ser)"]
+        IOIN --> CORE --> IOUT
+    end
+
+    ACC -- "participants · rooms<br/>(csv / json)" --> IOIN
+    STREAM[" Live arrivals<br/>WebSocket ≈ BlockingQueue"] -- "ArrivalStream" --> CORE
+    IOUT -- "allocations<br/>charge = price × nights" --> WAL
+    IOUT -- "allocations" --> MOB
+    IOUT -- "waitlist" --> ADM
+
+    classDef backend fill:#dbeafe,stroke:#1d4ed8,stroke-width:2px,color:#0f172a;
+    classDef engine fill:#d1fae5,stroke:#047857,stroke-width:2px,color:#0f172a;
+    classDef io fill:#fef3c7,stroke:#b45309,stroke-width:2px,color:#0f172a;
+    classDef core fill:#ede9fe,stroke:#6d28d9,stroke-width:2.5px,color:#0f172a;
+    classDef stream fill:#fee2e2,stroke:#b91c1c,stroke-width:2px,color:#0f172a;
+    class ACC,WAL,MOB,ADM backend;
+    class IOIN,IOUT io;
+    class CORE core;
+    class STREAM stream;
+    style BACKEND fill:#f8fafc,stroke:#94a3b8,stroke-width:1px,color:#1e293b;
+    style ENGINE fill:#f8fafc,stroke:#94a3b8,stroke-width:1px,color:#1e293b;

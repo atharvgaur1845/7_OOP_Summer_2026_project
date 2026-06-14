@@ -3,6 +3,12 @@ marp: true
 title: Accommodation Allocation Engine — Problem Formulation
 paginate: true
 size: 16:9
+style: |
+  section { font-size: 24px; }
+  h1, h2 { color: #6d28d9; }
+  table { font-size: 20px; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: center; }
+  img { background: #fff; }
 ---
 
 # Accommodation Allocation Engine
@@ -45,17 +51,23 @@ _Members: <Name 1>, <Name 2>, <Name 3>, <Name 4>_
 
 ## 3 · Mathematical model
 
-Assign participants $P$ to **beds** $B$ (room of capacity *k* → *k* beds).
+$$\min \sum_{i \in P}\sum_{j \in B} c_{ij}\,x_{ij}\quad\text{s.t.}\quad \textstyle\sum_j x_{ij}\le 1,\ \sum_i x_{ij}\le 1,\ x_{ij}\in\{0,1\}$$
 
-$$\min \sum_{i \in P}\sum_{j \in B} c_{ij}\,x_{ij}$$
+<div class="cols">
+<div>
 
-subject to one bed per participant and one participant per bed
-($\sum_j x_{ij}\le 1,\ \sum_i x_{ij}\le 1,\ x_{ij}\in\{0,1\}$).
+- $c_{ij}=\infty$ → **hard constraint** (gender / accessibility) = forbidden edge.
+- else $c_{ij}$ = **soft penalties**: budget overflow, building / room-type mismatch.
+- Pad to square $K\times K$ ($K=\max(|P|,|B|)$); solve **Hungarian O(K³)**.
+- **Kuhn bipartite matching** recovers feasible placements the optimum stranded.
 
-- $c_{ij}=\infty$ (forbidden) if gender policy or accessibility is violated → **hard constraints**.
-- otherwise $c_{ij}$ = weighted **soft penalties**: budget overflow, building / room-type mismatch.
-- Pad to a square $K\times K$ matrix ($K=\max(|P|,|B|)$) → solve with **Hungarian, O(K³)**.
-- **Kuhn bipartite matching** recovers any feasible placement the cost-optimum stranded.
+</div>
+<div>
+
+![w:340](diagrams/03-model.svg)
+
+</div>
+</div>
 
 ---
 
@@ -86,17 +98,10 @@ subject to one bed per participant and one participant per bed
 
 ## 6 · Integration with the platform
 
-```
-Accommodation module ──(participants.*, rooms.*)──▶  ALLOCATION ENGINE
-                                                          │
-        allocations.*  ──▶ Wallet module  (debit charge = price × nights)
-        allocations.*  ──▶ Mobile app     (notify "your room is H1-204")
-        waitlist.*     ──▶ Admin dashboard / re-allocation
-   live arrivals (WebSocket ≈ BlockingQueue) ──▶ incremental re-allocation
-```
+![w:1000 center](diagrams/01-integration.svg)
 
-File-exchange contract (CSV **and** JSON, matching Django REST payloads); `.ser` snapshot for
-offline cache / resume.
+File-exchange contract (CSV **and** JSON, matching Django REST payloads); a `BlockingQueue`
+arrival stream mimics the WebSocket feed; `.ser` snapshot for offline cache / resume.
 
 ---
 
@@ -114,16 +119,26 @@ offline cache / resume.
 
 ---
 
-## 8 · Architecture & deliverables
+## 8 · Architecture
+
+<div class="cols">
+<div>
+
+![w:460](diagrams/04-architecture.svg)
+
+</div>
+<div>
 
 - **Core engine** (`algorithm` + `service`) — pure, unit-tested, GUI-independent.
 - **DAO layer** (`io`) — CSV/JSON in, CSV/JSON/`.ser` out.
-- **CLI** — scriptable, CI-friendly runner.
-- **Swing GUI** — **two roles**: Admin/Warden dashboard (live `JTable`, metrics, arrival
-  simulation, export) and Participant view ("my room / my waitlist position").
-- **37 JUnit 5 tests** + README + this deck + 15–20 min demo video.
+- **CLI** — scriptable, CI-friendly.
+- **Swing GUI** — **two roles**: Admin dashboard + Participant view.
+- **37 JUnit 5 tests**, README, demo video.
 
-UML class diagram & data-flow diagram: see `diagrams.md`.
+</div>
+</div>
+
+Full pipeline, UML & GUI diagrams: see `diagrams/`.
 
 ---
 

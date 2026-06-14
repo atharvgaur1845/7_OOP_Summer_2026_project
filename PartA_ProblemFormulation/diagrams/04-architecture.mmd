@@ -1,0 +1,52 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Segoe UI, Helvetica, Arial','fontSize':'15px','lineColor':'#64748b','primaryTextColor':'#0f172a'}}}%%
+flowchart TB
+    subgraph ENTRY["Entry points"]
+        direction LR
+        CLI[" cli.Main<br/><small>headless / CI</small>"]
+        GUI[" gui.AppLauncher<br/><small>Admin + Participant · MVC/Observer</small>"]
+    end
+
+    SVC[" service.AccommodationAllocator<br/><small>validate → solve → fallback → nudge → waitlist</small>"]
+
+    subgraph ALG["algorithm"]
+        direction LR
+        HUN["HungarianAlgorithm"]
+        BIP["BipartiteMatcher"]
+        CMB["CostMatrixBuilder<br/><small>ExecutorService</small>"]
+    end
+    subgraph COST["cost"]
+        direction LR
+        CS["CostStrategy<br/><small>Strategy + Factory</small>"]
+        CFG["AllocationConfig<br/><small>Singleton</small>"]
+    end
+    subgraph IO["io"]
+        direction LR
+        REPO["Repository&lt;T&gt;<br/><small>DAO · CSV/JSON</small>"]
+        WR["AllocationWriter"]
+        ST["AllocationStore<br/><small>serialization</small>"]
+    end
+    CONC["concurrent.ArrivalStream<br/><small>BlockingQueue · Producer–Consumer</small>"]
+
+    CLI --> SVC
+    GUI --> SVC
+    GUI -.-> CONC --> SVC
+    SVC --> ALG
+    SVC --> COST
+    SVC --> IO
+
+    classDef entry fill:#dbeafe,stroke:#1d4ed8,stroke-width:2px,color:#0f172a;
+    classDef svc fill:#ede9fe,stroke:#6d28d9,stroke-width:2.5px,color:#0f172a;
+    classDef alg fill:#d1fae5,stroke:#047857,stroke-width:2px,color:#0f172a;
+    classDef cost fill:#ffe4e6,stroke:#be123c,stroke-width:2px,color:#0f172a;
+    classDef io fill:#fef3c7,stroke:#b45309,stroke-width:2px,color:#0f172a;
+    classDef conc fill:#fee2e2,stroke:#b91c1c,stroke-width:2px,color:#0f172a;
+    class CLI,GUI entry;
+    class SVC svc;
+    class HUN,BIP,CMB alg;
+    class CS,CFG cost;
+    class REPO,WR,ST io;
+    class CONC conc;
+    style ENTRY fill:#f8fafc,stroke:#cbd5e1,color:#1e293b;
+    style ALG fill:#f8fafc,stroke:#cbd5e1,color:#1e293b;
+    style COST fill:#f8fafc,stroke:#cbd5e1,color:#1e293b;
+    style IO fill:#f8fafc,stroke:#cbd5e1,color:#1e293b;
