@@ -1,15 +1,21 @@
-# Part A — Problem Formulation
+# Part A — Problem Formulation (ideation)
 
 Deliverable A for the **Accommodation Allocation Engine** (Track 1 — Mathematical Models for
 Operations). Submit before the mid-semester exam.
+
+This deliverable presents the **idea and plan** — the problem, the proposed mathematical model
+(Hungarian assignment), the planned integration and Java features, success metrics, and scope.
+It is framed as a proposal ("we will…"); the working system is Part B.
 
 ## Contents
 
 | File | Purpose |
 |---|---|
-| `slides.md` | The ≤10-slide presentation (Marp/Markdown). Problem, I/O, model, metrics, innovation, integration, Java features, scope. |
-| `speaker-notes.md` | Per-slide narration so each group member can present a section. |
-| `diagrams.md` | Mermaid data-flow, sequence, UML class, and GUI/Observer diagrams. |
+| `slides.pdf` | The rendered presentation (ready to submit / present). |
+| `slides.md` | Editable Marp/Markdown source of the deck (problem → idea → model → approach → integration → Java features → metrics → scope), with dedicated diagram slides. |
+| `speaker-notes.md` | One-line intent per slide (the slides are self-explanatory). |
+| `diagrams.md` | The conceptual diagrams (model idea, proposed pipeline, integration). |
+| `diagrams/` | Diagram sources (`.mmd`) + rendered `.svg` (slides) and `.png` (report). |
 
 ## How to render the slides to PDF/PPTX
 
