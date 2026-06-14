@@ -1,0 +1,8 @@
+[
+  { "id": "H1-101", "building": "H1", "floor": 1, "capacity": 2, "genderPolicy": "MALE",   "pricePerNight": 800,  "accessible": false, "roomType": "AC",     "amenities": ["wifi", "desk"] },
+  { "id": "H1-102", "building": "H1", "floor": 1, "capacity": 2, "genderPolicy": "FEMALE", "pricePerNight": 800,  "accessible": false, "roomType": "AC",     "amenities": ["wifi", "desk"] },
+  { "id": "H1-G01", "building": "H1", "floor": 0, "capacity": 1, "genderPolicy": "ANY",    "pricePerNight": 600,  "accessible": true,  "roomType": "NON_AC", "amenities": ["wifi", "ramp", "accessible-washroom"] },
+  { "id": "H2-201", "building": "H2", "floor": 2, "capacity": 3, "genderPolicy": "MALE",   "pricePerNight": 500,  "accessible": false, "roomType": "NON_AC", "amenities": ["wifi"] },
+  { "id": "H2-202", "building": "H2", "floor": 2, "capacity": 2, "genderPolicy": "FEMALE", "pricePerNight": 500,  "accessible": false, "roomType": "NON_AC", "amenities": ["wifi"] },
+  { "id": "H2-203", "building": "H2", "floor": 2, "capacity": 1, "genderPolicy": "ANY",    "pricePerNight": 1200, "accessible": false, "roomType": "AC",     "amenities": ["wifi", "ac", "balcony"] }
+]

@@ -1,0 +1,7 @@
+id,building,floor,capacity,genderPolicy,pricePerNight,accessible,roomType,amenities
+H1-101,H1,1,2,MALE,800,false,AC,wifi;desk
+H1-102,H1,1,2,FEMALE,800,false,AC,wifi;desk
+H1-G01,H1,0,1,ANY,600,true,NON_AC,wifi;ramp;accessible-washroom
+H2-201,H2,2,3,MALE,500,false,NON_AC,wifi
+H2-202,H2,2,2,FEMALE,500,false,NON_AC,wifi
+H2-203,H2,2,1,ANY,1200,false,AC,wifi;ac;balcony

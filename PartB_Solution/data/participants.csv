@@ -1,0 +1,14 @@
+id,name,gender,homeCity,budgetPerNight,arrivalDay,nights,needsAccessible,category,prefBuilding,prefRoomType,prefRoommates
+P001,Aarav Sharma,MALE,Jaipur,900,0,3,false,PERFORMER,H1,AC,P002
+P002,Vivaan Gupta,MALE,Jaipur,900,0,3,false,ATTENDEE,H1,AC,P001
+P003,Aditya Rao,MALE,Pune,600,1,2,false,ATTENDEE,H2,NON_AC,
+P004,Vihaan Nair,MALE,Kochi,550,1,2,false,ATTENDEE,H2,NON_AC,
+P005,Arjun Mehta,MALE,Delhi,1300,0,4,false,VIP,,AC,
+P006,Sai Krishnan,OTHER,Chennai,700,2,1,true,DELEGATE,,,
+P007,Diya Iyer,FEMALE,Mumbai,900,0,3,false,PERFORMER,H1,AC,P008
+P008,Ananya Reddy,FEMALE,Hyderabad,900,0,3,false,ATTENDEE,H1,AC,P007
+P009,Isha Menon,FEMALE,Kochi,550,1,2,false,ATTENDEE,H2,NON_AC,
+P010,Saanvi Joshi,FEMALE,Nagpur,550,1,2,false,ATTENDEE,H2,NON_AC,
+P011,Reyansh Bose,MALE,Kolkata,600,3,1,false,ATTENDEE,H2,NON_AC,
+P012,Kabir Singh,MALE,Amritsar,600,3,1,false,ATTENDEE,H2,NON_AC,
+P013,Myra Pillai,FEMALE,Trivandrum,600,3,1,false,ATTENDEE,H2,NON_AC,
