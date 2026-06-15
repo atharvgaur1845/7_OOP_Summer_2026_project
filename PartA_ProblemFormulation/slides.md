@@ -1,6 +1,6 @@
 ---
 marp: true
-title: Accommodation Allocation Engine — Problem Formulation (Part A)
+title: Accommodation Allocation Engine: Problem Formulation (Part A)
 paginate: true
 size: 16:9
 style: |
@@ -21,7 +21,7 @@ style: |
 # Accommodation Allocation Engine
 ### Optimal hostel-room assignment for the cultural festival
 
-**Part A — Problem Formulation**
+**Part A: Problem Formulation**
 Track 1 · Mathematical Models for Operations
 _Proposed approach: Hungarian (Kuhn–Munkres) algorithm + bipartite matching_
 
@@ -33,13 +33,13 @@ _Members: Atharv (2024A7UB0206P), Aarav (2024A7UB0205P)_
 ## 1 · The problem
 
 The festival serves **5,000–6,000 users**. Many are **outstation participants** who need a hostel
-bed for a few nights, and rooms are a **scarce, constrained resource** — each has a fixed
+bed for a few nights, and rooms are a **scarce, constrained resource**: each has a fixed
 capacity, a gender policy, a price, and may or may not be accessibility-equipped.
 
 Today the warden allocates rooms **by hand on a spreadsheet**. At this scale that causes:
 
-- **Gender / accessibility mistakes** — someone placed in an incompatible room.
-- **Ignored preferences** — building, room type, roommates.
+- **Gender / accessibility mistakes**: someone placed in an incompatible room.
+- **Ignored preferences**: building, room type, roommates.
 - **Wasted beds** sitting empty while other rooms are oversubscribed.
 - An **ad-hoc, unfair waitlist** when demand exceeds supply.
 
@@ -56,7 +56,7 @@ algorithm rather than manual heuristics.
 - Treat each **bed** as a slot and each **participant** as something to assign to a slot.
 - Score every (participant, room) pairing: **hard rules** (gender, accessibility) are *forbidden*;
   **soft preferences** (budget, building, room type, roommates) add a *penalty*.
-- Find the assignment with the **minimum total penalty** using the **Hungarian algorithm** — the
+- Find the assignment with the **minimum total penalty** using the **Hungarian algorithm**: the
   textbook exact, optimal method for assignment.
 - Whoever can't be seated goes onto a **priority-ordered waitlist**.
 
@@ -68,15 +68,15 @@ algorithm rather than manual heuristics.
 
 **Planned inputs** (exported by the Accommodation module as CSV / JSON):
 
-- **Participants** — id, gender, budget/night, nights, arrival day, accessibility need,
+- **Participants**: id, gender, budget/night, nights, arrival day, accessibility need,
   **category** (Performer / VIP / Delegate / Attendee), preferences (building, room type, roommates).
-- **Rooms** — id, building, floor, **capacity**, **gender policy**, price/night, accessible?, type.
+- **Rooms**: id, building, floor, **capacity**, **gender policy**, price/night, accessible?, type.
 
 **Planned outputs** (re-imported by the platform):
 
-- **`allocations`** — who stays in which room, plus the **wallet charge** = price × nights.
-- **`waitlist`** — everyone unplaced, ordered by priority.
-- **`metrics`** — placement rate, dissatisfaction, utilisation.
+- **`allocations`**: who stays in which room, plus the **wallet charge** = price × nights.
+- **`waitlist`**: everyone unplaced, ordered by priority.
+- **`metrics`**: placement rate, dissatisfaction, utilisation.
 
 <span class="note">CSV/JSON keeps the tool aligned with the platform's file-exchange and REST payloads.</span>
 
@@ -89,7 +89,7 @@ total cost:
 
 $$\min \sum_{i \in P}\sum_{j \in B} c_{ij}\,x_{ij}\qquad \text{s.t. } \textstyle\sum_j x_{ij}\le 1,\ \sum_i x_{ij}\le 1,\ x_{ij}\in\{0,1\}$$
 
-- $c_{ij}=\infty$ → **hard constraint** (gender policy or accessibility) — a *forbidden* pairing.
+- $c_{ij}=\infty$ → **hard constraint** (gender policy or accessibility): a *forbidden* pairing.
 - otherwise $c_{ij}$ = sum of **soft penalties**: budget overflow + building / room-type mismatch.
 
 We will pad the costs to a **square $K\times K$ matrix** ($K=\max(|P|,|B|)$) with zero-cost dummy
@@ -99,7 +99,7 @@ matched to a dummy column is **waitlisted**.
 ---
 
 <!-- _class: diagram -->
-## 5 · Modelling approach — capacity → beds → square matrix
+## 5 · Modelling approach: capacity → beds → square matrix
 
 ![h:480](diagrams/03-model.svg)
 
@@ -112,11 +112,11 @@ matched to a dummy column is **waitlisted**.
 We plan a clear **optimise → repair → finalise** pipeline:
 
 1. **Validate** the input (unique IDs, sane capacities).
-2. **Build the cost matrix** — score every (participant, bed) pair (computed concurrently).
-3. **Hungarian solve** — the globally optimal minimum-cost assignment.
-4. **Bipartite-matching fallback** — re-seat anyone the optimum stranded into beds left free.
-5. **Roommate co-location** — a light, cost-neutral improvement pass.
-6. **Build the waitlist** — order the overflow by priority.
+2. **Build the cost matrix**: score every (participant, bed) pair (computed concurrently).
+3. **Hungarian solve**: the globally optimal minimum-cost assignment.
+4. **Bipartite-matching fallback**: re-seat anyone the optimum stranded into beds left free.
+5. **Roommate co-location**: a light, cost-neutral improvement pass.
+6. **Build the waitlist**: order the overflow by priority.
 
 <span class="note">Each later stage only improves the result; none can break a hard constraint or worsen total dissatisfaction.</span>
 
@@ -131,21 +131,21 @@ We plan a clear **optimise → repair → finalise** pipeline:
 
 ---
 
-## 8 · Innovation — why this is more than a textbook solve
+## 8 · Innovation: why this is more than a textbook solve
 
-- **Capacity via bed-expansion + dummy padding** — turns a messy many-to-one, unequal-size problem
+- **Capacity via bed-expansion + dummy padding**: turns a messy many-to-one, unequal-size problem
   into a *clean square assignment* that can be solved **exactly**, not heuristically.
-- **Priority as a matrix-only bias** — decide *who* wins a scarce bed (performers first) **without**
+- **Priority as a matrix-only bias**: decide *who* wins a scarce bed (performers first) **without**
   distorting which room a seated person gets.
-- **Optimise-then-repair** — combine an exact optimiser with a feasibility-recovery matching pass.
-- **Real-time ready** — plan a streaming intake so **late registrations** can be allocated live,
+- **Optimise-then-repair**: combine an exact optimiser with a feasibility-recovery matching pass.
+- **Real-time ready**: plan a streaming intake so **late registrations** can be allocated live,
   mirroring the platform's WebSocket feed.
 
 ---
 
 ## 9 · Planned integration with the platform
 
-The tool will reuse the platform's existing **file-exchange** channel — Django can produce the
+The tool will reuse the platform's existing **file-exchange** channel: Django can produce the
 inputs and consume the outputs unchanged:
 
 - **In** ← Accommodation module: `participants.*`, `rooms.*`.
@@ -177,7 +177,7 @@ inputs and consume the outputs unchanged:
 | **Custom exceptions** | clear errors for invalid / infeasible / unreadable input |
 | **Design patterns** | Strategy, Factory, DAO, Observer/MVC, Singleton, Producer–Consumer |
 
-<span class="note">Comfortably satisfies the "justify ≥ 2 advanced features" requirement — each maps to a concrete need.</span>
+<span class="note">Comfortably satisfies the "justify ≥ 2 advanced features" requirement: each maps to a concrete need.</span>
 
 ---
 
@@ -187,7 +187,7 @@ inputs and consume the outputs unchanged:
 |---|---|
 | Hard-constraint violations | **zero** (gender / accessibility never broken) |
 | Placement rate | as high as capacity allows (100 % when beds ≥ demand) |
-| Total / average dissatisfaction | minimised — the global optimum |
+| Total / average dissatisfaction | minimised: the global optimum |
 | Bed utilisation | maximised (few empty beds) |
 | Runtime for a few hundred participants | well under a second |
 | Waitlist fairness | deterministic order: category → arrival day → ID |
@@ -198,9 +198,9 @@ inputs and consume the outputs unchanged:
 
 Self-contained, no server required; will run from sample data:
 
-- **Week 1** — domain model, Hungarian core, cost model, unit tests.
-- **Week 2** — CSV/JSON I/O, allocation orchestration, waitlist, serialization, CLI.
-- **Week 3** — Swing GUI (separate Admin & Participant views), arrival stream, demo + report.
+- **Week 1**: domain model, Hungarian core, cost model, unit tests.
+- **Week 2**: CSV/JSON I/O, allocation orchestration, waitlist, serialization, CLI.
+- **Week 3**: Swing GUI (separate Admin & Participant views), arrival stream, demo + report.
 
 **Planned deliverables (Part B):** documented Java implementation · unit tests · CLI + two-role
 GUI · integration via sample CSV/JSON files · demo video.
@@ -209,10 +209,10 @@ GUI · integration via sample CSV/JSON files · demo video.
 
 # Thank you
 
-**Accommodation Allocation Engine — Problem Formulation**
+**Accommodation Allocation Engine: Problem Formulation**
 A proposal to make festival room allocation **optimal, fair and constraint-safe**, integrated
 with the Wallet, Mobile and Accommodation modules.
 
-**Group 7** — Atharv (2024A7UB0206P), Aarav (2024A7UB0205P)
+**Group 7**: Atharv (2024A7UB0206P), Aarav (2024A7UB0205P)
 
 _Questions?_
